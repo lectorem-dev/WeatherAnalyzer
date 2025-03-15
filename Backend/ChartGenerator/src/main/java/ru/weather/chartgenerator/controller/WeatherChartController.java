@@ -3,10 +3,7 @@ package ru.weather.chartgenerator.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
 import ru.weather.chartgenerator.service.TemperatureBarChartService;
 import ru.weather.chartgenerator.service.MonthlyAverageChartService;
@@ -14,7 +11,6 @@ import ru.weather.chartgenerator.service.DailyTrendChartService;
 import ru.weather.chartgenerator.service.MonthlyBarChartService;
 import ru.weather.chartgenerator.service.ParameterPieChartService;
 import ru.weather.chartgenerator.service.TemperatureLineChartService;
-
 
 @RestController
 @RequestMapping("/charts")
@@ -37,9 +33,7 @@ public class WeatherChartController {
             summary = "Линейный график температуры",
             description = "Отображает максимальную и минимальную температуру на одном линейном графике.")
     @GetMapping(value = "/temperature/line", produces = "image/svg+xml")
-    public String getTemperatureLineChart() {
-        return temperatureLineChartService.generateTemperatureLineChart();
-    }
+    public String getTemperatureLineChart() { return temperatureLineChartService.generateTemperatureLineChart(); }
 
     @Operation(
             summary = "Столбчатая диаграмма температуры",
