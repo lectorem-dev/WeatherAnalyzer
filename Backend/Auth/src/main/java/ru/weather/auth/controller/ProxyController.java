@@ -13,7 +13,7 @@ public class ProxyController {
     @Autowired
     public ProxyController(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder
-                .baseUrl("http://localhost:8001")  // Указываем базовый URL
+                .baseUrl("http://generator:8001")  // Указываем базовый URL
                 .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024)) // Устанавливаем лимит 10MB
                 .build();
     }
