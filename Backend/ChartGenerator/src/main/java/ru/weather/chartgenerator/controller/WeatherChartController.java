@@ -51,7 +51,7 @@ public class WeatherChartController {
 
     @Operation(
             summary = "Линейный график параметра по месяцам",
-            description = "Отображает выбранный параметр в виде сглаженного линейного графика, усредненного по месяцам. Доступные значения columnName: [укажите доступные параметры]")
+            description = "Отображает выбранный параметр в виде сглаженного линейного графика, усредненного по месяцам. Доступные значения columnName: [ rainfall evaporation sunshine windgustspeed ]")
     @GetMapping(value = "/parameter/{columnName}/monthly/line", produces = "image/svg+xml")
     public String getMonthlyAverageLineChart(@PathVariable String columnName) {
         return monthlyAverageChartService.generateLineChart(columnName);
@@ -59,7 +59,7 @@ public class WeatherChartController {
 
     @Operation(
             summary = "Линейный график параметра по дням",
-            description = "Отображает выбранный параметр линейным графиком без сглаживания, данные представлены по дням. Доступные значения columnName: [укажите доступные параметры]")
+            description = "Отображает выбранный параметр линейным графиком без сглаживания, данные представлены по дням. Доступные значения columnName: [ rainfall evaporation sunshine windgustspeed ]")
     @GetMapping(value = "/parameter/{columnName}/daily/line", produces = "image/svg+xml")
     public String getDailyTrendLineChart(@PathVariable String columnName) {
         return dailyTrendChartService.generateLineChart(columnName);
@@ -67,7 +67,7 @@ public class WeatherChartController {
 
     @Operation(
             summary = "Столбчатая диаграмма параметра по месяцам",
-            description = "Отображает выбранный параметр в виде столбчатой диаграммы, усредненного по месяцам. Доступные значения columnName: [укажите доступные параметры]")
+            description = "Отображает выбранный параметр в виде столбчатой диаграммы, усредненного по месяцам. Доступные значения columnName: [ rainfall evaporation sunshine windgustspeed ]")
     @GetMapping(value = "/parameter/{columnName}/monthly/bar", produces = "image/svg+xml")
     public String getMonthlyBarChart(@PathVariable String columnName) {
         return monthlyBarChartService.generateMonthlyBarChart(columnName);
@@ -75,11 +75,9 @@ public class WeatherChartController {
 
     @Operation(
             summary = "Круговая диаграмма параметров",
-            description = "Отображает выбранный параметр в виде круговой диаграммы. Доступные значения columnName: [укажите доступные параметры]")
+            description = "Отображает выбранный параметр в виде круговой диаграммы. Доступные значения columnName: [ windgustdir winddir9am winddir3am ]")
     @GetMapping(value = "/parameter/{columnName}/pie", produces = "image/svg+xml")
     public String getPieChart(@PathVariable String columnName) {
         return parameterPieChartService.generatePieChart(columnName);
     }
 }
-
-
