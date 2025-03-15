@@ -14,7 +14,7 @@ public class ProxyController {
     public ProxyController(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder
                 .baseUrl("http://localhost:8001")  // Указываем базовый URL
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(1048576)) // Увеличиваем лимит на 1MB
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024)) // Устанавливаем лимит 10MB
                 .build();
     }
 
@@ -26,7 +26,7 @@ public class ProxyController {
         return webClient.get()
                 .uri(uri)
                 .retrieve()
-                .toEntity(String.class)  // Ожидаем строку для SVG
+                .toEntity(String.class)
                 .block();  // Блокируем вызов, чтобы дождаться ответа от проксируемого сервиса
     }
 }

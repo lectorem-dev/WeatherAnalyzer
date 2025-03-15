@@ -27,6 +27,7 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, tokenStorage), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/auth/login").permitAll() // Разрешаем доступ к /auth/login
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll() // Разрешаем доступ к Swagger UI и документации
                         .anyRequest().authenticated() // Все остальные запросы требуют аутентификацию
                 )
                 .csrf(AbstractHttpConfigurer::disable); // Отключаем CSRF для API
