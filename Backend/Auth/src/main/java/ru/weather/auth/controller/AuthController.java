@@ -32,7 +32,6 @@ public class AuthController {
         return ResponseEntity.ok(authResponse);
     }
 
-
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestParam UUID userId) {
         authService.logout(userId);

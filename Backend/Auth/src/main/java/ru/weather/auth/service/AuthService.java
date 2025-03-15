@@ -20,9 +20,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private static final String AUTH_QUERY = """
-        SELECT u.id, u.password, r.authority
+        SELECT u.id, u.password
         FROM users u
-        JOIN user_role r ON u.rid = r.id
         WHERE u.login = ?
     """;
 
@@ -33,13 +32,11 @@ public class AuthService {
 
             if (passwordEncoder.matches(password, storedPasswordHash)) {
                 UUID userId = (UUID) result.get("id");
-                String authority = (String) result.get("authority");
 
-                String token = jwtUtil.generateToken(userId, authority);
+                String token = jwtUtil.generateToken(userId);
                 tokenStorage.storeToken(userId, token);
 
-                // Возвращаем полное DTO с id, ролью и токеном
-                return new AuthResponse(userId, authority, token);
+                return new AuthResponse(userId, token);
             }
         } catch (EmptyResultDataAccessException e) {
             throw new IllegalArgumentException("Invalid login credentials");
@@ -47,7 +44,6 @@ public class AuthService {
 
         return null;
     }
-
 
     public void logout(UUID userId) {
         tokenStorage.revokeToken(userId);

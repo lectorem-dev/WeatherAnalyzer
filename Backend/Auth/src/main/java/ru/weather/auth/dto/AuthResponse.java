@@ -8,12 +8,10 @@ import java.util.UUID;
 @Getter
 public class AuthResponse {
     private UUID id;
-    private String role;
     private String token;
 
-    public AuthResponse(UUID id, String role, String token) {
+    public AuthResponse(UUID id, String token) {
         this.id = id;
-        this.role = role;
         this.token = token;
     }
 }

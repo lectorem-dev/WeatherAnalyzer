@@ -15,15 +15,14 @@ import java.util.UUID;
 @Component
 public class JwtUtil {
     private final SecretKey secretKey = Keys.hmacShaKeyFor(
-            Base64.getDecoder().decode("sTcjr6irg3/xAGLWeMgjUW4IMUJSQ2dS8kEXE/a+76E=")
+            Base64.getDecoder().decode("V5MzqC0OJiw57s8nAZazfCoOxBb63pYgwV1sXoYKCRo=") // HmacSHA256 - 256 бит
     );
 
     private final long expirationMs = 3600000; // 1 час
 
-    public String generateToken(UUID userId, String role) {
+    public String generateToken(UUID userId) {
         return Jwts.builder()
                 .setSubject(userId.toString())
-                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
