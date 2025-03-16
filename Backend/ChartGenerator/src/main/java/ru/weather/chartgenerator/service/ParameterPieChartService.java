@@ -52,7 +52,7 @@ public class ParameterPieChartService {
         JFreeChart chart = createChart(dataset);
 
         // Конвертируем диаграмму в SVG
-        return convertChartToSVG(chart, 600, 800); // Устанавливаем размер области для отображения
+        return convertChartToSVG(chart, 800, 600); // Устанавливаем размер области для отображения
     }
 
     private JFreeChart createChart(DefaultPieDataset dataset) {
@@ -83,25 +83,15 @@ public class ParameterPieChartService {
         Document document = GenericDOMImplementation.getDOMImplementation()
                 .createDocument(null, "svg", null);
         SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+        chart.draw(svgGenerator, new java.awt.Rectangle(width, height));
 
-        // Устанавливаем область рендеринга
-        chart.draw(svgGenerator, new java.awt.Rectangle(0, 0, width, height));
-
-        // Настроим аттрибуты SVG для правильного отображения
         StringWriter writer = new StringWriter();
         try {
             svgGenerator.stream(writer, true);
-
-            // Получаем результат как строку
-            String svgOutput = writer.toString();
-
-            // Добавим явные аттрибуты width и height в SVG
-            svgOutput = svgOutput.replace("<svg", "<svg width=\"" + width + "\" height=\"" + height + "\"");
-
-            return svgOutput;
         } catch (Exception e) {
             throw new RuntimeException("Error generating SVG", e);
         }
-    }
 
+        return writer.toString();
+    }
 }

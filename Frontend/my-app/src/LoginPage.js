@@ -1,69 +1,52 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import React from 'react';
+import { Form, Input, Button, message } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { loginUser } from './api/fetchAuth'; // Импорт функции API
 
 const LoginPage = () => {
-  const [login, setLogin] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const credentials = { login, password };
-
+  const onFinish = async (values) => {
     try {
-      const response = await fetch('http://localhost:8000/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('token', data.token); // Save token to localStorage
-        setError(null);
-        navigate('/main');
-      } else {
-        setError('Неверный логин или пароль');
-      }
+      const data = await loginUser(values);
+      localStorage.setItem('token', data.token);
+      message.success('Авторизация успешна!');
+      navigate('/main');
     } catch (error) {
-      setError('Ошибка при авторизации');
+      message.error(error.message);
     }
   };
 
   return (
-    <div>
-      <h2>Авторизация</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="login">Логин:</label>
-          <input
-            type="text"
-            id="login"  // Added unique id
-            name="login"  // Added unique name
-            value={login}
-            onChange={(e) => setLogin(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Пароль:</label>
-          <input
-            type="password"
-            id="password"  // Added unique id
-            name="password"  // Added unique name
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Войти</button>
-      </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div style={{ maxWidth: 400, margin: '50px auto', padding: 20, border: '1px solid #ddd', borderRadius: 8 }}>
+      <h2 style={{ textAlign: 'center' }}>Авторизация</h2>
+      <Form
+        name="login"
+        layout="vertical"
+        onFinish={onFinish}
+      >
+        <Form.Item
+          label="Логин"
+          name="login"
+          rules={[{ required: true, message: 'Введите логин!' }]}
+        >
+          <Input />
+        </Form.Item>
+
+        <Form.Item
+          label="Пароль"
+          name="password"
+          rules={[{ required: true, message: 'Введите пароль!' }]}
+        >
+          <Input.Password />
+        </Form.Item>
+
+        <Form.Item>
+          <Button type="primary" htmlType="submit" block>
+            Войти
+          </Button>
+        </Form.Item>
+      </Form>
     </div>
   );
 };
