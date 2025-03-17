@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
+import { Select, Card, Typography } from 'antd';
+import { fetchSvgCharts } from './api/fetchSvg';
+
+const { Option } = Select;
+const { Title } = Typography;
 
 const MainPage = () => {
   const [svgLineContent, setSvgLineContent] = useState(null);
@@ -7,241 +12,164 @@ const MainPage = () => {
   const [svgParameterContent, setSvgParameterContent] = useState(null);
   const [svgDailyParameterContent, setSvgDailyParameterContent] = useState(null);
   const [svgSunshineMonthlyBarContent, setSvgSunshineMonthlyBarContent] = useState(null);
+  // const [svgPieContent, setSvgPieContent] = useState(null);
+
   const [selectedParameter, setSelectedParameter] = useState('rainfall');
   const [selectedDailyParameter, setSelectedDailyParameter] = useState('rainfall');
+  const [selectedSunshineParameter, setSelectedSunshineParameter] = useState('sunshine');
+  // const [selectedPieParameter, setSelectedPieParameter] = useState('windgustdir');
+
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Получаем токен из localStorage (предполагается, что мы сохранили его после логина)
   const token = localStorage.getItem('token');
 
   useEffect(() => {
     if (!token) {
-      // Если токен отсутствует, перенаправляем на страницу входа
-      navigate('/login'); 
+        navigate('/');
     } else {
-      fetchSvg(token);
+        fetchCharts(); // Этот метод вызывается при изменении зависимостей
     }
-  }, [token, navigate]);
+}, [token, selectedParameter, selectedDailyParameter, selectedSunshineParameter]);
 
-  const fetchSvg = async (token) => {
-    try {
-      // Загружаем первый график (line)
-      const lineResponse = await fetch('http://localhost:8000/charts/temperature/line', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
 
-      if (lineResponse.ok) {
-        const svgLineText = await lineResponse.text();
-        setSvgLineContent(svgLineText); // Устанавливаем SVG для line
-      } else {
-        setError('Ошибка при загрузке графика Line');
-      }
+const [loading, setLoading] = useState(false);
 
-      // Загружаем второй график (bar)
-      const barResponse = await fetch('http://localhost:8000/charts/temperature/bar', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+const fetchCharts = async () => {
+    if (loading) return; // Если запрос уже в процессе, не выполняем его снова
+    setLoading(true);
 
-      if (barResponse.ok) {
-        const svgBarText = await barResponse.text();
-        setSvgBarContent(svgBarText); // Устанавливаем SVG для bar
-      } else {
-        setError('Ошибка при загрузке графика Bar');
-      }
+    const results = await fetchSvgCharts(token, selectedParameter, selectedDailyParameter, selectedSunshineParameter);
 
-      // Загружаем график для выбранного параметра
-      const parameterResponse = await fetch(
-        `http://localhost:8000/charts/parameter/${selectedParameter}/monthly/line`, 
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (parameterResponse.ok) {
-        const svgParameterText = await parameterResponse.text();
-        setSvgParameterContent(svgParameterText); // Устанавливаем SVG для выбранного параметра
-      } else {
-        setError('Ошибка при загрузке графика параметра');
-      }
-
-      // Загружаем график для дневного выбранного параметра
-      const dailyParameterResponse = await fetch(
-        `http://localhost:8000/charts/parameter/${selectedDailyParameter}/daily/line`, 
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (dailyParameterResponse.ok) {
-        const svgDailyParameterText = await dailyParameterResponse.text();
-        setSvgDailyParameterContent(svgDailyParameterText); // Устанавливаем SVG для дневного параметра
-      } else {
-        setError('Ошибка при загрузке графика дневного параметра');
-      }
-
-      // Загружаем график для sunshine monthly bar
-      const sunshineMonthlyBarResponse = await fetch(
-        `http://localhost:8000/charts/parameter/sunshine/monthly/bar`, 
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (sunshineMonthlyBarResponse.ok) {
-        const svgSunshineMonthlyBarText = await sunshineMonthlyBarResponse.text();
-        setSvgSunshineMonthlyBarContent(svgSunshineMonthlyBarText); // Устанавливаем SVG для sunshine monthly bar
-      } else {
-        setError('Ошибка при загрузке графика Sunshine Monthly Bar');
-      }
-    } catch (error) {
-      setError('Ошибка при запросе SVG');
+    if (results.error) {
+        setError(results.error);
+    } else {
+        setSvgLineContent(results.line || null);
+        setSvgBarContent(results.bar || null);
+        setSvgParameterContent(results.parameter || null);
+        setSvgDailyParameterContent(results.dailyParameter || null);
+        setSvgSunshineMonthlyBarContent(results.sunshineMonthlyBar || null);
+        // setSvgPieContent(results.pieChart || null);
     }
-  };
 
-  const handleParameterChange = (event) => {
-    const selected = event.target.value;
-    setSelectedParameter(selected); // Обновляем выбранный параметр
-    fetchSvg(localStorage.getItem('token')); // Загружаем новый график для выбранного параметра
-  };
-
-  const handleDailyParameterChange = (event) => {
-    const selected = event.target.value;
-    setSelectedDailyParameter(selected); // Обновляем выбранный дневной параметр
-    fetchSvg(localStorage.getItem('token')); // Загружаем новый график для дневного параметра
-  };
-
-  return (
-    <div>
-      <h1>График температуры</h1>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-
-      {svgLineContent ? (
-        <div
-          style={{
-            width: '100%',  // Устанавливаем ширину контейнера на 100%
-            maxWidth: '800px',  // Ограничиваем максимальную ширину
-            height: '600px', // Устанавливаем фиксированную высоту
-            overflow: 'hidden', // Обрезаем все, что выходит за пределы
-          }}
-          dangerouslySetInnerHTML={{
-            __html: svgLineContent.replace(
-              /<svg([^>]*)>/,
-              '<svg$1 width="100%" height="100%" viewBox="0 0 800 600">'
-            ), 
-          }} 
-        />
-      ) : (
-        <p>Загружается график Line...</p>
-      )}
-
-      <h1>График температур (Bar)</h1>
-      {svgBarContent ? (
-        <div
-          style={{
-            width: '100%',  // Устанавливаем ширину контейнера на 100%
-            maxWidth: '800px',  // Ограничиваем максимальную ширину
-            height: '600px', // Устанавливаем фиксированную высоту
-            overflow: 'hidden', // Обрезаем все, что выходит за пределы
-          }}
-          dangerouslySetInnerHTML={{
-            __html: svgBarContent.replace(
-              /<svg([^>]*)>/,
-              '<svg$1 width="100%" height="100%" viewBox="0 0 800 600">'
-            ), 
-          }} 
-        />
-      ) : (
-        <p>Загружается график Bar...</p>
-      )}
-
-      <h1>Выберите параметр</h1>
-      <select onChange={handleParameterChange} value={selectedParameter}>
-        <option value="rainfall">Rainfall</option>
-        <option value="evaporation">Evaporation</option>
-        <option value="sunshine">Sunshine</option>
-        <option value="windgustspeed">Wind Gust Speed</option>
-      </select>
-
-      <h1>График выбранного параметра (Monthly)</h1>
-      {svgParameterContent ? (
-        <div
-          style={{
-            width: '100%',  // Устанавливаем ширину контейнера на 100%
-            maxWidth: '800px',  // Ограничиваем максимальную ширину
-            height: '600px', // Устанавливаем фиксированную высоту
-            overflow: 'hidden', // Обрезаем все, что выходит за пределы
-          }}
-          dangerouslySetInnerHTML={{
-            __html: svgParameterContent.replace(
-              /<svg([^>]*)>/,
-              '<svg$1 width="100%" height="100%" viewBox="0 0 800 600">'
-            ), 
-          }} 
-        />
-      ) : (
-        <p>Загружается график параметра (Monthly)...</p>
-      )}
-
-      <h1>Выберите дневной параметр</h1>
-      <select onChange={handleDailyParameterChange} value={selectedDailyParameter}>
-        <option value="rainfall">Rainfall</option>
-        <option value="evaporation">Evaporation</option>
-        <option value="sunshine">Sunshine</option>
-        <option value="windgustspeed">Wind Gust Speed</option>
-      </select>
-
-      <h1>График дневного параметра</h1>
-      {svgDailyParameterContent ? (
-        <div
-          style={{
-            width: '100%',  // Устанавливаем ширину контейнера на 100%
-            maxWidth: '800px',  // Ограничиваем максимальную ширину
-            height: '600px', // Устанавливаем фиксированную высоту
-            overflow: 'hidden', // Обрезаем все, что выходит за пределы
-          }}
-          dangerouslySetInnerHTML={{
-            __html: svgDailyParameterContent.replace(
-              /<svg([^>]*)>/,
-              '<svg$1 width="100%" height="100%" viewBox="0 0 800 600">'
-            ), 
-          }} 
-        />
-      ) : (
-        <p>Загружается график дневного параметра...</p>
-      )}
-
-      <h1>График Sunshine Monthly (Bar)</h1>
-      {svgSunshineMonthlyBarContent ? (
-        <div
-          style={{
-            width: '100%',  // Устанавливаем ширину контейнера на 100%
-            maxWidth: '800px',  // Ограничиваем максимальную ширину
-            height: '600px', // Устанавливаем фиксированную высоту
-            overflow: 'hidden', // Обрезаем все, что выходит за пределы
-          }}
-          dangerouslySetInnerHTML={{
-            __html: svgSunshineMonthlyBarContent.replace(
-              /<svg([^>]*)>/,
-              '<svg$1 width="100%" height="100%" viewBox="0 0 800 600">'
-            ), 
-          }} 
-        />
-      ) : (
-        <p>Загружается график Sunshine Monthly Bar...</p>
-      )}
-    </div>
-  );
+    setLoading(false);
 };
 
+  const svgStyle = {
+    width: '100%', // Ширина 100% контейнера
+    height: '100%', // Высота 100% контейнера
+    display: 'block', // Убирает лишние отступы
+    objectFit: 'contain', // Сохраняет пропорции, растягивает по максимуму
+  };  
+
+  const replaceSvgContent = (svgContent) => {
+    return svgContent
+      ? svgContent.replace(
+          /<svg([^>]*)>/,
+          '<svg$1 width="100%" height="100%" viewBox="0 0 800 600">'
+        )
+      : ''; // Возвращаем пустую строку, если контент не доступен
+  };
+  
+  return (
+    <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
+      {error && <Title type="danger" level={4}>{error}</Title>}
+  
+      <Card title="Графики максимальной и минимальной температуры по дням" variant={false} style={{ marginBottom: '20px' }}>
+        <div
+          style={svgStyle}
+          dangerouslySetInnerHTML={{
+            __html: replaceSvgContent(svgLineContent),
+          }}
+        />
+      </Card>
+
+      <Card title="Графики максимальной и минимальной температуры, усреднённые по месяцам" variant={false} style={{ marginBottom: '20px' }}>
+        <div
+          style={svgStyle}
+          dangerouslySetInnerHTML={{
+            __html: replaceSvgContent(svgBarContent),
+          }}
+        />
+      </Card>
+  
+      <Card title="Средние значения по месяцам" variant={false} style={{ marginBottom: '20px' }}>
+        <Select
+          value={selectedParameter}
+          onChange={setSelectedParameter}
+          style={{ width: '200px', marginBottom: '10px' }}
+        >
+          <Option value="rainfall">Ливень</Option>
+          <Option value="evaporation">Испарение</Option>
+          <Option value="sunshine">Солнечный свет</Option>
+          <Option value="windgustspeed">Скорость порыва ветра</Option>
+        </Select>
+        <div
+          style={svgStyle}
+          dangerouslySetInnerHTML={{
+            __html: replaceSvgContent(svgParameterContent),
+          }}
+        />
+      </Card>
+  
+      <Card title="Подрорбные значения по дням" variant={false} style={{ marginBottom: '20px' }}>
+        <Select
+          value={selectedDailyParameter}
+          onChange={setSelectedDailyParameter}
+          style={{ width: '200px', marginBottom: '10px' }}
+        >
+          <Option value="rainfall">Ливень</Option>
+          <Option value="evaporation">Испарение</Option>
+          <Option value="sunshine">Солнечный свет</Option>
+          <Option value="windgustspeed">Скорость порыва ветра</Option>
+        </Select>
+        <div
+          style={svgStyle}
+          dangerouslySetInnerHTML={{
+            __html: replaceSvgContent(svgDailyParameterContent),
+          }}
+        />
+      </Card>
+  
+      <Card title="Средние значения по месяцам, столбчатая диаграмма" variant={false}>
+        <Select
+          value={selectedSunshineParameter}
+          onChange={setSelectedSunshineParameter}
+          style={{ width: '200px', marginBottom: '10px' }}
+        >
+          <Option value="rainfall">Ливень</Option>
+          <Option value="evaporation">Испарение</Option>
+          <Option value="sunshine">Солнечный свет</Option>
+          <Option value="windgustspeed">Скорость порыва ветра</Option>
+        </Select>
+        <div
+          style={svgStyle}
+          dangerouslySetInnerHTML={{
+            __html: replaceSvgContent(svgSunshineMonthlyBarContent),
+          }}
+        />
+      </Card>
+    </div>
+  );
+}  
+
 export default MainPage;
+
+/*
+<Card title="Пончик" variant={false} style={{ marginBottom: '20px' }}>
+        <Select
+          value={selectedPieParameter}
+          onChange={setSelectedPieParameter}
+          style={{ width: '200px', marginBottom: '10px' }}
+        >
+          <Option value="windgustdir">Направление порыва ветра</Option>
+          <Option value="winddir9am">Направление ветра в 9 утра</Option>
+        </Select>
+        <div
+          style={svgStyle}
+          dangerouslySetInnerHTML={{
+            __html: replaceSvgContent(svgPieContent),
+          }}
+        />
+      </Card>
+*/
