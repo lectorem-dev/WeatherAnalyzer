@@ -5,12 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import ru.weather.chartgenerator.service.TemperatureBarChartService;
-import ru.weather.chartgenerator.service.MonthlyAverageChartService;
-import ru.weather.chartgenerator.service.DailyTrendChartService;
-import ru.weather.chartgenerator.service.MonthlyBarChartService;
-import ru.weather.chartgenerator.service.ParameterPieChartService;
-import ru.weather.chartgenerator.service.TemperatureLineChartService;
+import ru.weather.chartgenerator.service.*;
 
 @RestController
 @RequestMapping("/charts")
@@ -20,12 +15,14 @@ public class WeatherChartController {
     private TemperatureLineChartService temperatureLineChartService;
     @Autowired
     private TemperatureBarChartService temperatureBarChartService;
+
+
     @Autowired
     private MonthlyAverageChartService monthlyAverageChartService;
     @Autowired
-    private DailyTrendChartService dailyTrendChartService;
+    private LineChartSvgRenderer dailyTrendChartService;
     @Autowired
-    private MonthlyBarChartService monthlyBarChartService;
+    private WordFrequencyChartSvgRenderer monthlyBarChartService;
     @Autowired
     private ParameterPieChartService parameterPieChartService;
 
@@ -54,7 +51,7 @@ public class WeatherChartController {
     @Operation(
             summary = "Линейный график параметра по дням",
             description = "Отображает выбранный параметр линейным графиком без сглаживания, данные представлены по дням. Доступные значения columnName: [ rainfall evaporation sunshine windgustspeed ]")
-    @GetMapping(value = "/parameter/{columnName}/daily/line", produces = "image/svg+xml")
+    @GetMapping(value = "/{columnName}/line", produces = "image/svg+xml")
     public String getDailyTrendLineChart(@PathVariable String columnName) {
         return dailyTrendChartService.generateLineChart(columnName);
     }
@@ -62,9 +59,9 @@ public class WeatherChartController {
     @Operation(
             summary = "Столбчатая диаграмма параметра по месяцам",
             description = "Отображает выбранный параметр в виде столбчатой диаграммы, усредненного по месяцам. Доступные значения columnName: [ rainfall evaporation sunshine windgustspeed ]")
-    @GetMapping(value = "/parameter/{columnName}/monthly/bar", produces = "image/svg+xml")
+    @GetMapping(value = "/{columnName}/monthly-bar", produces = "image/svg+xml")
     public String getMonthlyBarChart(@PathVariable String columnName) {
-        return monthlyBarChartService.generateMonthlyBarChart(columnName);
+        return monthlyBarChartService.generateWordFrequencyChart(columnName);
     }
 
     @Operation(
