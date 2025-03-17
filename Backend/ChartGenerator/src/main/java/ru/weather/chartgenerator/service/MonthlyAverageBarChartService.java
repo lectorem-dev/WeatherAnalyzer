@@ -15,45 +15,22 @@ import ru.weather.chartgenerator.util.SvgChartExporter;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Component
-public class BarChartSvgRenderer {
+public class MonthlyAverageBarChartService {
     private final JdbcTemplate jdbcTemplate;
     private final SvgChartExporter svgChartExporter;
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
     private static final int DAYS_IN_MONTH = 29;
 
-    private static final Set<String> ALLOWED_COLUMNS = Set.of(
-            "mintemp",
-            "maxtemp",
-            "rainfall",
-            "evaporation",
-            "sunshine",
-            "windgustspeed",
-            "windspeed9am",
-            "windspeed3pm",
-            "humidity9am",
-            "humidity3pm",
-            "pressure9am",
-            "pressure3pm",
-            "cloud9am",
-            "cloud3pm",
-            "temp9am",
-            "temp3pm",
-            "risk_mm"
-    );
-
-    public BarChartSvgRenderer(JdbcTemplate jdbcTemplate, SvgChartExporter svgChartExporter) {
+    public MonthlyAverageBarChartService(JdbcTemplate jdbcTemplate, SvgChartExporter svgChartExporter) {
         this.jdbcTemplate = jdbcTemplate;
         this.svgChartExporter = svgChartExporter;
     }
 
-    public String generateBarChart(String columnName) {
-        if (!ALLOWED_COLUMNS.contains(columnName)) {
-            throw new IllegalArgumentException("Invalid column: " + columnName);
-        }
+    public String generateMonthlyAverageBarChart(String columnName) {
+        svgChartExporter.validateNumericColumn(columnName);
 
         XYSeries series = new XYSeries(columnName);
 

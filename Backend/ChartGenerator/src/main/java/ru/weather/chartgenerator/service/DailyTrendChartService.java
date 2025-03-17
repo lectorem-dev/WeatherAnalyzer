@@ -15,44 +15,21 @@ import ru.weather.chartgenerator.util.SvgChartExporter;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Service
-public class LineChartSvgRenderer {
+public class DailyTrendChartService {
     private final JdbcTemplate jdbcTemplate;
     private final SvgChartExporter svgChartExporter;
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
 
-    private static final Set<String> ALLOWED_COLUMNS = Set.of(
-            "mintemp",
-            "maxtemp",
-            "rainfall",
-            "evaporation",
-            "sunshine",
-            "windgustspeed",
-            "windspeed9am",
-            "windspeed3pm",
-            "humidity9am",
-            "humidity3pm",
-            "pressure9am",
-            "pressure3pm",
-            "cloud9am",
-            "cloud3pm",
-            "temp9am",
-            "temp3pm",
-            "risk_mm"
-    );
-
-    public LineChartSvgRenderer(JdbcTemplate jdbcTemplate, SvgChartExporter svgChartExporter) {
+    public DailyTrendChartService(JdbcTemplate jdbcTemplate, SvgChartExporter svgChartExporter) {
         this.jdbcTemplate = jdbcTemplate;
         this.svgChartExporter = svgChartExporter;
     }
 
-    public String generateLineChart(String columnName) {
-        if (!ALLOWED_COLUMNS.contains(columnName)) {
-            throw new IllegalArgumentException("Invalid column: " + columnName);
-        }
+    public String generateDailyTrendChart(String columnName) {
+        svgChartExporter.validateNumericColumn(columnName);
 
         XYSeries series = new XYSeries(columnName);
         String sql = "SELECT " + columnName + " FROM observations";

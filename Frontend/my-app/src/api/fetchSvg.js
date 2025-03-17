@@ -1,11 +1,9 @@
-export const fetchSvgCharts = async (token, selectedParameter, selectedDailyParameter, selectedSunshineParameter) => {
+export const fetchSvgCharts = async (token, selectedComparisonParameters, selectedDailyTrendParameter, selectedMonthlyAverageParameter, selectedTextFrequencyParameter) => {
     const endpoints = {
-        line: 'http://localhost:8000/charts/temperature/line',
-        bar: 'http://localhost:8000/charts/temperature/bar',
-        parameter: `http://localhost:8000/charts/parameter/${selectedParameter}/monthly/line`,
-        dailyParameter: `http://localhost:8000/charts/parameter/${selectedDailyParameter}/daily/line`,
-        sunshineMonthlyBar: `http://localhost:8000/charts/parameter/${selectedSunshineParameter}/monthly/bar`,
-        // pieChart: `http://localhost:8000/charts/parameter/${selectedPieParameter}/pie`,
+        comparison: `http://localhost:8000/charts/${selectedComparisonParameters[0]}/${selectedComparisonParameters[1]}/comparison`,
+        dailyTrend: `http://localhost:8000/charts/${selectedDailyTrendParameter}/daily-trend`,
+        monthlyAverageBar: `http://localhost:8000/charts/${selectedMonthlyAverageParameter}/monthly-average-bar`,
+        textFrequency: `http://localhost:8000/charts/${selectedTextFrequencyParameter}/text-frequency`,
     };
 
     try {

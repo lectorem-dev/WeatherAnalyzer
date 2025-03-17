@@ -15,32 +15,22 @@ import ru.weather.chartgenerator.util.SvgChartExporter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Component
-public class WordFrequencyChartSvgRenderer {
+public class TextFrequencyChartService {
     private final JdbcTemplate jdbcTemplate;
     private final SvgChartExporter svgChartExporter;
 
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
-    private static final Set<String> ALLOWED_COLUMNS = Set.of(
-            "windgustdir",
-            "winddir9am",
-            "winddir3pm",
-            "raintoday",
-            "raintomorrow"
-    );
 
-    public WordFrequencyChartSvgRenderer(JdbcTemplate jdbcTemplate, SvgChartExporter svgChartExporter) {
+    public TextFrequencyChartService(JdbcTemplate jdbcTemplate, SvgChartExporter svgChartExporter) {
         this.jdbcTemplate = jdbcTemplate;
         this.svgChartExporter = svgChartExporter;
     }
 
-    public String generateWordFrequencyChart(String columnName) {
-        if (!ALLOWED_COLUMNS.contains(columnName)) {
-            throw new IllegalArgumentException("Invalid column: " + columnName);
-        }
+    public String generateTextFrequencyChart(String columnName) {
+        svgChartExporter.validateStringColumn(columnName);
 
         // Создаем карту для подсчета вхождений слов
         Map<String, Integer> wordFrequency = new HashMap<>();
