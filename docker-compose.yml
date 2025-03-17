@@ -1,0 +1,65 @@
+services:
+  # Сервис для бэкенда - auth
+  auth:
+    build:
+      context: ./Backend/Auth  # Путь к папке с Auth
+      dockerfile: Dockerfile
+    container_name: auth
+    ports:
+      - "8000:8000"  # Прокидываем порты для auth
+    networks:
+      - app-network
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/weather
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
+
+  # Сервис для бэкенда - generator
+  generator:
+    build:
+      context: ./Backend/ChartGenerator  # Путь к папке с ChartGenerator
+      dockerfile: Dockerfile
+    container_name: generator
+    expose:
+      - "8001"  # Прокидываем порты для generator
+    networks:
+      - app-network
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/weather
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
+
+  # Сервис для фронтенда
+  frontend:
+    build:
+      context: ./Frontend/my-app  # Путь к папке с фронтендом
+      dockerfile: Dockerfile  # Путь к Dockerfile для фронтенда
+    container_name: frontend
+    ports:
+      - "3000:80"  # Прокидываем порты для фронтенда
+    networks:
+      - app-network
+
+  # Сервис для базы данных
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: weather
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    networks:
+      - app-network
+    volumes:
+      - ./Backend/backup.sql:/docker-entrypoint-initdb.d/backup.sql  # Подключаем SQL файл с бэкапом
+
+networks:
+  app-network:
+    driver: bridge
