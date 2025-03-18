@@ -38,7 +38,7 @@ services:
   # Сервис для бэкенда - simulator
   simulator:
     build:
-      context: ./Backend/RealtimeWeatherSimulator  # Путь к папке с ChartGenerator
+      context: ./Backend/RealtimeWeatherSimulator
       dockerfile: Dockerfile
     container_name: simulator
     expose:

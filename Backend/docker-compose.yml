@@ -33,6 +33,16 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
 
+  simulator:
+    build:
+      context: ./RealtimeWeatherSimulator
+      dockerfile: Dockerfile
+    container_name: simulator
+    expose:
+      - "8002"  # Прокидываем порты для simulator
+    networks:
+      - app-network
+
   postgres:
     image: postgres:15
     container_name: postgres
