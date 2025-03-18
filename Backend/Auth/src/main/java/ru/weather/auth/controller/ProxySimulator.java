@@ -1,25 +1,26 @@
 package ru.weather.auth.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @RestController
-public class ProxyController {
+public class ProxySimulator {
     private final WebClient webClient;
 
     @Autowired
-    public ProxyController(WebClient.Builder webClientBuilder) {
+    public ProxySimulator(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder
-                .baseUrl("http://generator:8001")  // Указываем базовый URL
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024)) // Устанавливаем лимит 10MB
+                .baseUrl("http://simulator:8002")  // Указываем базовый URL
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(1024 * 1024)) // Устанавливаем лимит 1MB
                 .build();
     }
 
     // Прокси для GET-запросов
-    @GetMapping("/**")
+    @GetMapping("/realtime-weather-simulator/**")
     public ResponseEntity<?> proxyGet(HttpServletRequest request) {
         String uri = request.getRequestURI().replace(request.getContextPath(), "");
 

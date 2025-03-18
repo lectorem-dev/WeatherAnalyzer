@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Select, Card, Typography } from 'antd';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { fetchSvgCharts } from './api/fetchSvg';
+import { fetchRealtimeData } from './api/fetchRealtimeData';
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -17,6 +19,9 @@ const MainPage = () => {
   const [selectedMonthlyAverageParameter, setSelectedMonthlyAverageParameter] = useState('rainfall');
   const [selectedTextFrequencyParameter, setSelectedTextFrequencyParameter] = useState('windgustdir');
 
+  const [data, setData] = useState([]);
+  const [frequency, setFrequency] = useState(10);  // Частота обновления в секундах
+
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
@@ -24,11 +29,25 @@ const MainPage = () => {
 
   useEffect(() => {
     if (!token) {
-        navigate('/');
+      navigate('/');
     } else {
-        fetchCharts(); 
+      fetchCharts();
+      const fetchData = async () => {
+        const fetchedData = await fetchRealtimeData(token);
+        if (fetchedData) {
+          setData(fetchedData);
+        } else {
+          setError('Ошибка при получении данных');
+        } 
+      }
+
+      fetchData();  // Изначальный запрос данных
+
+      const interval = setInterval(fetchData, frequency * 1000);  // Обновление данных по частоте
+      return () => clearInterval(interval); 
+
     }
-}, [token, selectedComparisonParameters, selectedDailyTrendParameter, selectedMonthlyAverageParameter, selectedTextFrequencyParameter]);
+  }, [token, selectedComparisonParameters, selectedDailyTrendParameter, selectedMonthlyAverageParameter, selectedTextFrequencyParameter, frequency]);  // Все зависимости в одном массиве
 
 const [loading, setLoading] = useState(false);
 
@@ -111,12 +130,25 @@ const TextSelect = ({ value, onChange }) => (
   </Select>
 );
 
+// Обработчик выбора частоты обновления
+const handleFrequencyChange = (value) => {
+  setFrequency(value);
+};
+
+// Данные для графиков
+const chartData = data.map((item) => ({
+  timestamp: item.timestamp,
+  temperature: item.temperature,
+  humidity: item.humidity,
+  windSpeed: item.windSpeed,
+}));
+
 return (
   <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
     {error && <Title type="danger" level={4}>{error}</Title>}
 
     <Card title="О сайте" variant={false} style={{ marginBottom: '20px' }}>
-      <p>Этот сайт предназначен для визуализации данных из погодного датасета. Он предоставляет четыре инструмента для анализа различных параметров погоды:</p>
+    <p>Этот сайт предназначен для визуализации данных из погодного датасета. Он предоставляет четыре инструмента для анализа различных параметров погоды:</p>
       <ul>
         <li>График для сравнения двух погодных параметров – позволяет выбрать два параметра и сравнить их на одном графике.</li>
         <li>График тренда по дням – отображает изменение выбранного погодного параметра в течение времени.</li>
@@ -124,7 +156,38 @@ return (
         <li>График частоты текстовых параметров – анализирует частоту появления текстовых данных, таких как направление ветра или наличие осадков.</li>
       </ul>
       <p>Вы можете выбирать параметры для анализа с помощью выпадающих списков, а графики автоматически обновляются в соответствии с вашим выбором.</p>
+      <p>На сайте также реализован модуль получения данных в реальном времени. На стороне бекенда существует модуль генерирующий случайные параметры каждую секунду, 
+        и хранящий данные за 3 минуты. Данные поступают через API в формате json и включают параметры, такие как температура, влажность и скорость верта. На стороне 
+        клиента из полученных данных формируется dataset который рендерится средствами React.</p>
     </Card>
+
+    <Card title="Графики погоды в реальном времени" style={{ marginBottom: '20px' }}>
+        <Select
+          value={frequency}
+          onChange={handleFrequencyChange}
+          style={{ width: '200px', marginBottom: '20px' }}
+        >
+          <Option value={5}>5 секунд</Option>
+          <Option value={10}>10 секунд</Option>
+          <Option value={20}>20 секунд</Option>
+          <Option value={30}>30 секунд</Option>
+        </Select>
+
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="timestamp" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="temperature" stroke="#8884d8" />
+              <Line type="monotone" dataKey="humidity" stroke="#82ca9d" />
+              <Line type="monotone" dataKey="windSpeed" stroke="#ff7300" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </Card>
 
     <Card title="График для сравнения двух погодных параметров" variant={false} style={{ marginBottom: '20px' }}>
       <WeatherSelect value={selectedComparisonParameters[0]} onChange={(value) => setSelectedComparisonParameters([value, selectedComparisonParameters[1]])} />

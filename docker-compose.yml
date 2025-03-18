@@ -35,6 +35,17 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
 
+  # Сервис для бэкенда - simulator
+  simulator:
+    build:
+      context: ./Backend/RealtimeWeatherSimulator  # Путь к папке с ChartGenerator
+      dockerfile: Dockerfile
+    container_name: simulator
+    expose:
+      - "8002"  # Прокидываем порты для simulator
+    networks:
+      - app-network
+
   # Сервис для фронтенда
   frontend:
     build:

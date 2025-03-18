@@ -28,6 +28,7 @@
     <modules>
         <module>Backend/Auth</module>
         <module>Backend/ChartGenerator</module>
+        <module>Backend/RealtimeWeatherSimulator</module>
     </modules>
 
     <!-- Управление зависимостями -->
