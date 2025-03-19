@@ -78,6 +78,10 @@ docker-compose up --build
 
 5. Открыть в браузере:
 
-React-фронтенд, для авторизации используйте ivanovii/qwerty123 : [React](http://localhost:3000)
+Фронтенд : [React](http://localhost:3000) - *login:* ivanovii *password:* qwerty123
 
-Документация эндпоинтов backend-a : [Swagger](http://localhost:3000)
+Документация эндпоинтов backend-a (Swagger):
+
+- [Auth API](http://localhost:8000/auth/swagger-ui/index.html)
+- [Generator API](http://localhost:8000/generator/swagger-ui/index.html)
+- [Simulator API](http://localhost:8000/simulator/swagger-ui/index.html)

@@ -30,8 +30,10 @@ public class SecurityConfig {
         http
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, tokenStorage), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/auth/login").permitAll() // Разрешаем доступ к /auth/login
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll() // Разрешаем доступ к Swagger UI и документации
+                        .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers("/auth/swagger-ui/**", "/auth/doc/**", "/auth/swagger-ui.html").permitAll()
+                        .requestMatchers("/generator/swagger-ui/**", "/generator/doc/**", "/generator/swagger-ui.html").permitAll()
+                        .requestMatchers("/simulator/swagger-ui/**", "/simulator/doc/**", "/simulator/swagger-ui.html").permitAll()
                         .anyRequest().authenticated() // Все остальные запросы требуют аутентификацию
                 )
                 .csrf(AbstractHttpConfigurer::disable) // Отключаем CSRF для API

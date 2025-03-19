@@ -26,19 +26,19 @@ public class ProxyGenerator {
         return proxyRequest(uri);
     }
 
-    @GetMapping("/swagger-ui/**")
+    @GetMapping("/generator/swagger-ui/**")
     public ResponseEntity<?> proxySwagger(HttpServletRequest request) {
         String uri = request.getRequestURI().replace(request.getContextPath(), "");
         return proxyRequest(uri);
     }
 
-    @GetMapping("/v3/api-docs/**")
+    @GetMapping("/generator/doc/**")
     public ResponseEntity<?> proxyApiDocs(HttpServletRequest request) {
         String uri = request.getRequestURI().replace(request.getContextPath(), "");
         return proxyRequest(uri);
     }
 
-    @GetMapping("/swagger-ui.html")
+    @GetMapping("/generator/swagger-ui.html")
     public ResponseEntity<?> proxySwaggerHtml(HttpServletRequest request) {
         String uri = request.getRequestURI().replace(request.getContextPath(), "");
         return proxyRequest(uri);
