@@ -73,11 +73,11 @@ mvn package
 4. Запустить Docker
 
 ```bash
-docker-compose up -build
+docker-compose up --build
 ```
 
 5. Открыть в браузере:
 
-React-фронтенд, для авторизации используйте логи/пароль: [React](http://localhost:3000)
+React-фронтенд, для авторизации используйте ivanovii/qwerty123 : [React](http://localhost:3000)
 
 Документация эндпоинтов backend-a : [Swagger](http://localhost:3000)
