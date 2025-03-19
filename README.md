@@ -73,7 +73,7 @@ mvn package
 4. Запустить Docker
 
 ```bash
-docker-compose up -build
+docker-compose up --build
 ```
 
 5. Открыть в браузере:
