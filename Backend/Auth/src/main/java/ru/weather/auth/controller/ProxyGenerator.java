@@ -1,10 +1,12 @@
 package ru.weather.auth.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class ProxyGenerator {
@@ -18,15 +20,39 @@ public class ProxyGenerator {
                 .build();
     }
 
-    // Прокси для GET-запросов
     @GetMapping("/charts/**")
     public ResponseEntity<?> proxyGet(HttpServletRequest request) {
         String uri = request.getRequestURI().replace(request.getContextPath(), "");
+        return proxyRequest(uri);
+    }
 
-        return webClient.get()
-                .uri(uri)
-                .retrieve()
-                .toEntity(String.class)
-                .block();  // Блокируем вызов, чтобы дождаться ответа от проксируемого сервиса
+    @GetMapping("/swagger-ui/**")
+    public ResponseEntity<?> proxySwagger(HttpServletRequest request) {
+        String uri = request.getRequestURI().replace(request.getContextPath(), "");
+        return proxyRequest(uri);
+    }
+
+    @GetMapping("/v3/api-docs/**")
+    public ResponseEntity<?> proxyApiDocs(HttpServletRequest request) {
+        String uri = request.getRequestURI().replace(request.getContextPath(), "");
+        return proxyRequest(uri);
+    }
+
+    @GetMapping("/swagger-ui.html")
+    public ResponseEntity<?> proxySwaggerHtml(HttpServletRequest request) {
+        String uri = request.getRequestURI().replace(request.getContextPath(), "");
+        return proxyRequest(uri);
+    }
+
+    private ResponseEntity<?> proxyRequest(String uri) {
+        try {
+            return webClient.get()
+                    .uri(uri)
+                    .retrieve()
+                    .toEntity(String.class)
+                    .block();  // Блокируем вызов, чтобы дождаться ответа от проксируемого сервиса
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Ошибка проксирования", e);
+        }
     }
 }
