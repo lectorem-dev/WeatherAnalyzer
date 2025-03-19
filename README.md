@@ -47,7 +47,7 @@
 
 Запуск всех компонентов выполняется через docker-compose.yml, который поднимает всю инфраструктуру:
 
-КАРТИНКА
+![Архитектура](https://github.com/lectorem-dev/WeatherAnalyzer/blob/main/Dataset/Architecture.png)
 
 ### Запуск 
 
