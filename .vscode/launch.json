@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-RealtimeWeatherSimulatorApplication<RealtimeWeatherSimulator>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "ru.weather.simulator.RealtimeWeatherSimulatorApplication",
+            "projectName": "RealtimeWeatherSimulator",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
