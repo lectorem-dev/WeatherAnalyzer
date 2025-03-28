@@ -16,14 +16,14 @@ public class WeatherService {
     private final Random random = new Random();
 
     public WeatherService() {
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 180; i++) {
             weatherHistory.add(generateWeatherDTO());
         }
     }
 
     @Scheduled(fixedRate = 1000) // Обновление каждую секунду
     public void updateWeather() {
-        if (weatherHistory.size() >= 50) {
+        if (weatherHistory.size() >= 180) {
             weatherHistory.pollFirst(); // Удаляем старейший элемент
         }
         weatherHistory.addLast(generateWeatherDTO()); // Добавляем новый

@@ -50,7 +50,7 @@ public class ProxyGenerator {
                     .uri(uri)
                     .retrieve()
                     .toEntity(String.class)
-                    .block();  // Блокируем вызов, чтобы дождаться ответа от проксируемого сервиса
+                    .block();
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Ошибка проксирования", e);
         }

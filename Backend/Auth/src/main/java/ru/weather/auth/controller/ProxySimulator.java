@@ -24,7 +24,11 @@ public class ProxySimulator {
     @GetMapping("/realtime-weather-simulator/**")
     public ResponseEntity<?> proxyGet(HttpServletRequest request) {
         String uri = request.getRequestURI().replace(request.getContextPath(), "");
-        return proxyRequest(uri);  // Блокируем вызов, чтобы дождаться ответа от проксируемого сервиса
+        String queryString = request.getQueryString(); // Получаем строку запроса
+
+        String fullUri = queryString != null ? uri + "?" + queryString : uri;
+
+        return proxyRequest(fullUri);  // Блокируем вызов, чтобы дождаться ответа от проксируемого сервиса
     }
 
     @GetMapping("/simulator/swagger-ui/**")
