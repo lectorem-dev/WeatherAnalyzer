@@ -31,24 +31,6 @@ public class ProxySimulator {
         return proxyRequest(fullUri);  // Блокируем вызов, чтобы дождаться ответа от проксируемого сервиса
     }
 
-    @GetMapping("/simulator/swagger-ui/**")
-    public ResponseEntity<?> proxySwagger(HttpServletRequest request) {
-        String uri = request.getRequestURI().replace(request.getContextPath(), "");
-        return proxyRequest(uri);
-    }
-
-    @GetMapping("/simulator/doc/**")
-    public ResponseEntity<?> proxyApiDocs(HttpServletRequest request) {
-        String uri = request.getRequestURI().replace(request.getContextPath(), "");
-        return proxyRequest(uri);
-    }
-
-    @GetMapping("/simulator/swagger-ui.html")
-    public ResponseEntity<?> proxySwaggerHtml(HttpServletRequest request) {
-        String uri = request.getRequestURI().replace(request.getContextPath(), "");
-        return proxyRequest(uri);
-    }
-
     private ResponseEntity<?> proxyRequest(String uri) {
         try {
             return webClient.get()
