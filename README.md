@@ -81,6 +81,5 @@ docker-compose up --build
 
 Документация эндпоинтов backend-a (Swagger):
 
-- [Auth API](http://localhost:8000/auth/swagger-ui/index.html)
-- [Generator API](http://localhost:8000/generator/swagger-ui/index.html)
-- [Simulator API](http://localhost:8000/simulator/swagger-ui/index.html)
+- [Generator API](http://localhost:8000/sw/generator/swagger-ui/index.html)
+- [Simulator API](http://localhost:8000/sw/simulator/swagger-ui/index.html)
