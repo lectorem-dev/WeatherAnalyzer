@@ -58,6 +58,9 @@
 git clone https://github.com/lectorem-dev/WeatherAnalyzer.git
 ```
 
+* Можно открыть папку WeatherAnalyzer и воспользоваться start-prod.bat чтобы запустить проект, а потом 
+очистить докер с помощью cleanup-docker.bat
+
 2. Перейти в папку проекта:
 ```bash
 cd WeatherAnalyzer
